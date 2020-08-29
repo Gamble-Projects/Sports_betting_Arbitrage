@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
-
+ 
 namespace WebScraper
 {
     class Program
@@ -18,6 +18,7 @@ namespace WebScraper
             Console.OutputEncoding = Encoding.GetEncoding("Windows-1255");
             makeDictOfHebWord();
             WebDataScrap();
+            
         }
 
         public static void WebDataScrap()
@@ -25,12 +26,12 @@ namespace WebScraper
             try
             {
                 //Get the content of the URL from the Web
-                const string url = "https://www.winner.co.il/mainbook/sport-%D7%9B%D7%93%D7%95%D7%A8%D7%92%D7%9C";
+                const string url = "https://www.winner.co.il/mainbook/sport-%D7%9B%D7%93%D7%95%D7%A8%D7%92%D7%9C?&marketTypePeriod=1%7C100";
                 var web = new HtmlWeb();
 
                 //web.OverrideEncoding = Encoding.GetEncoding(862);
                 var doc = web.Load(url);
-
+               
 
                 //Get the content from a file
                 //var path = "countries.html";
@@ -43,14 +44,20 @@ namespace WebScraper
                                 .ToList()
                                 .ForEach(n => n.Remove());
 
-                const string classValue = "name ellipsis outcomedescription";
-                var nodes = doc.DocumentNode.SelectNodes($"//*[@class='{classValue}']") ?? Enumerable.Empty<HtmlNode>();
-                int i = 0;
-
-                foreach (var node in nodes)
+                //const string classValue = "name ellipsis outcomedescription";
+                const string MainTable = "rollup market_type market_type_id_1 period_id_100 win_draw_win multi_event game_type rollup-down";
+                const string classValueTeamName = "title ";
+                const string classValueRtaio = "formatted_price";
+                HtmlNodeCollection nodesTeamNames = doc.DocumentNode.SelectNodes($"//*[@class='{classValueTeamName}']");
+                HtmlNodeCollection nodeRatioss = doc.DocumentNode.SelectNodes($"//*[@class='{classValueRtaio}']") ;
+                int counter = 0;
+                
+                for(int i = 0; i < nodesTeamNames.Count; i++)
                 {
                     StringBuilder tempStringForNode = new StringBuilder();
-                    Array tempNameOfTeam = node.InnerText.Reverse().ToArray();
+                    Array tempNameOfTeam = nodesTeamNames[i].Attributes["title"].Value.Reverse().ToArray();
+                   
+                    //Array tempNameOfTeam = node.InnerText.Reverse().ToArray();
 
                     foreach (char c in tempNameOfTeam)
                     {
@@ -59,29 +66,33 @@ namespace WebScraper
                             tempStringForNode.Append(c);
                         }
                     }
+                    
                     //byte [] bytes = Encoding.GetEncoding(862).GetBytes(node.InnerText);
                     //Console.WriteLine("אבא שלכם זונה");
                     //Console.WriteLine(Encoding.GetEncoding("Windows-1255").GetString(bytes));
                     if(tempStringForNode.Length > 0)
                     {
-                        i++;
+                        counter++;
                         Console.Write(tempStringForNode);
-                        const string classValuetemp = "formatted_price";
-                        //var tempnode = doc.DocumentNode.SelectNodes($"//*[@class='{classValuetemp}']") ?? Enumerable.Empty<HtmlNode>();
-                        Console.WriteLine(node.SelectNodes($"//*[@class='{classValue}']") ?? Enumerable.Empty<HtmlNode>());
-                        if (i==1)
+                        //var node_temp = node.SelectSingleNode($"//*[@class='{"price price_147248478 priced"}']");
+                        //var num = node.SelectSingleNode($"//*[@class='{"formatted_price"}']");
+                        
+                        if (counter == 1)
                         {
+                            Console.Write(nodeRatioss[i].InnerText);
                             Console.Write(" vs ");
                         }
-                        else if (i == 2)
+                        else if (counter == 2)
                         {
+                            Console.Write(nodeRatioss[i].InnerText);
                             Console.WriteLine("");
-                            i = 0;
+                            counter = 0;
+                           
                         }
                     }
-
+                  
                 }
-
+                
 
                 Console.WriteLine("\r\nPlease press a key...");
                 Console.ReadKey();
