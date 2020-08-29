@@ -26,7 +26,7 @@ namespace WebScraper
             try
             {
                 //Get the content of the URL from the Web
-                const string url = "https://www.winner.co.il/mainbook/sport-%D7%9B%D7%93%D7%95%D7%A8%D7%92%D7%9C";
+                const string url = "https://www.winner.co.il/mainbook/sport-%D7%9B%D7%93%D7%95%D7%A8%D7%92%D7%9C?&marketTypePeriod=1%7C100";
                 var web = new HtmlWeb();
 
                 //web.OverrideEncoding = Encoding.GetEncoding(862);
@@ -44,14 +44,20 @@ namespace WebScraper
                                 .ToList()
                                 .ForEach(n => n.Remove());
 
-                const string classValue = "name ellipsis outcomedescription";
-                var nodes = doc.DocumentNode.SelectNodes($"//*[@class='{classValue}']") ?? Enumerable.Empty<HtmlNode>();
-                int i = 0;
-
-                foreach (var node in nodes)
+                //const string classValue = "name ellipsis outcomedescription";
+                const string MainTable = "rollup market_type market_type_id_1 period_id_100 win_draw_win multi_event game_type rollup-down";
+                const string classValueTeamName = "title ";
+                const string classValueRtaio = "formatted_price";
+                HtmlNodeCollection nodesTeamNames = doc.DocumentNode.SelectNodes($"//*[@class='{classValueTeamName}']");
+                HtmlNodeCollection nodeRatioss = doc.DocumentNode.SelectNodes($"//*[@class='{classValueRtaio}']") ;
+                int counter = 0;
+                
+                for(int i = 0; i < nodesTeamNames.Count; i++)
                 {
                     StringBuilder tempStringForNode = new StringBuilder();
-                    Array tempNameOfTeam = node.InnerText.Reverse().ToArray();
+                    Array tempNameOfTeam = nodesTeamNames[i].Attributes["title"].Value.Reverse().ToArray();
+                   
+                    //Array tempNameOfTeam = node.InnerText.Reverse().ToArray();
 
                     foreach (char c in tempNameOfTeam)
                     {
@@ -60,21 +66,28 @@ namespace WebScraper
                             tempStringForNode.Append(c);
                         }
                     }
+                    
                     //byte [] bytes = Encoding.GetEncoding(862).GetBytes(node.InnerText);
                     //Console.WriteLine("אבא שלכם זונה");
                     //Console.WriteLine(Encoding.GetEncoding("Windows-1255").GetString(bytes));
                     if(tempStringForNode.Length > 0)
                     {
-                        i++;
+                        counter++;
                         Console.Write(tempStringForNode);
-                        if(i==1)
+                        //var node_temp = node.SelectSingleNode($"//*[@class='{"price price_147248478 priced"}']");
+                        //var num = node.SelectSingleNode($"//*[@class='{"formatted_price"}']");
+                        
+                        if (counter == 1)
                         {
+                            Console.Write(nodeRatioss[i].InnerText);
                             Console.Write(" vs ");
                         }
-                        else if (i == 2)
+                        else if (counter == 2)
                         {
+                            Console.Write(nodeRatioss[i].InnerText);
                             Console.WriteLine("");
-                            i = 0;
+                            counter = 0;
+                           
                         }
                     }
                   
