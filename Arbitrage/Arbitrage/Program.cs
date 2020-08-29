@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
- 
+
 namespace WebScraper
 {
     class Program
@@ -18,7 +18,6 @@ namespace WebScraper
             Console.OutputEncoding = Encoding.GetEncoding("Windows-1255");
             makeDictOfHebWord();
             WebDataScrap();
-            
         }
 
         public static void WebDataScrap()
@@ -31,7 +30,7 @@ namespace WebScraper
 
                 //web.OverrideEncoding = Encoding.GetEncoding(862);
                 var doc = web.Load(url);
-               
+
 
                 //Get the content from a file
                 //var path = "countries.html";
@@ -67,7 +66,10 @@ namespace WebScraper
                     {
                         i++;
                         Console.Write(tempStringForNode);
-                        if(i==1)
+                        const string classValuetemp = "formatted_price";
+                        //var tempnode = doc.DocumentNode.SelectNodes($"//*[@class='{classValuetemp}']") ?? Enumerable.Empty<HtmlNode>();
+                        Console.WriteLine(node.SelectNodes($"//*[@class='{classValue}']") ?? Enumerable.Empty<HtmlNode>());
+                        if (i==1)
                         {
                             Console.Write(" vs ");
                         }
@@ -77,9 +79,9 @@ namespace WebScraper
                             i = 0;
                         }
                     }
-                  
+
                 }
-                
+
 
                 Console.WriteLine("\r\nPlease press a key...");
                 Console.ReadKey();
