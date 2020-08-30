@@ -6,17 +6,19 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
- 
+
 namespace WebScraper
 {
     class Program
     {
-        private readonly static Dictionary<char, char> m_hebWord = new Dictionary<char, char>();
+        private static Dictionary<char, char> m_hebWord = new Dictionary<char, char>();
+
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.GetEncoding("Windows-1255");
             makeDictOfHebWord();
             WebDataScrap();
+
         }
 
         public static void WebDataScrap()
@@ -29,7 +31,7 @@ namespace WebScraper
 
                 //web.OverrideEncoding = Encoding.GetEncoding(862);
                 var doc = web.Load(url);
-               
+                Console.Write(doc.GetType());
 
                 //Get the content from a file
                 //var path = "countries.html";
@@ -37,64 +39,58 @@ namespace WebScraper
                 //doc.Load(path);
 
                 //Filter the content
-                doc.DocumentNode.Descendants()
-                                .Where(n => n.Name == "script")
-                                .ToList()
-                                .ForEach(n => n.Remove());
+                doc.DocumentNode.Descendants().Where(n => n.Name == "script").ToList() .ForEach(n => n.Remove());
 
                 //const string classValue = "name ellipsis outcomedescription";
-                const string classGame = "event-content sport_FOOT";
+                //const string MainTable = "rollup market_type market_type_id_1 period_id_100 win_draw_win multi_event game_type rollup-down";
                 const string classValueTeamName = "title ";
                 const string classValueRtaio = "formatted_price";
-                const string classStats = "statistics";
-                const string classStatsURL = "stats-popup";
-                HtmlNodeCollection nodesTeamNames = doc.DocumentNode.SelectNodes($"//*[@class='{"event"}']");
+                HtmlNodeCollection nodesTeamNames = doc.DocumentNode.SelectNodes($"//*[@class='{classValueTeamName}']");
+                HtmlNodeCollection nodeRatioss = doc.DocumentNode.SelectNodes($"//*[@class='{classValueRtaio}']") ;
                 int counter = 0;
-                
-                foreach(var node in nodesTeamNames)
+                int j;
+
+                for(int i = 0; i < nodesTeamNames.Count; i++)
                 {
-                    Console.WriteLine(node.GetType());
                     StringBuilder tempStringForNode = new StringBuilder();
-                    var tempNameOfTeams = node.SelectNodes($"td/table/tbody/tr/td/div/div[@class='{classValueTeamName}']");
-                
-                    Array tempNameOfTeam1 = tempNameOfTeams[0].Attributes["title"].Value.Reverse().ToArray();
-                    Array tempNameOfTeam2 = tempNameOfTeams[2].Attributes["title"].Value.Reverse().ToArray();
-                   // foreach (char c in tempNameOfTeam)
-                    //{
-                      //  if (m_hebWord.ContainsKey(c))
-                        //{
-                          //  tempStringForNode.Append(c);
-                            
-                        //}
-                    //}
-                    
+                    Array tempNameOfTeam = nodesTeamNames[i].Attributes["title"].Value.Reverse().ToArray();
+
+                    //Array tempNameOfTeam = node.InnerText.Reverse().ToArray();
+
+                    foreach (char c in tempNameOfTeam)
+                    {
+                        if (m_hebWord.ContainsKey(c))
+                        {
+                            tempStringForNode.Append(c);
+                        }
+                    }
+
                     //byte [] bytes = Encoding.GetEncoding(862).GetBytes(node.InnerText);
                     //Console.WriteLine("אבא שלכם זונה");
                     //Console.WriteLine(Encoding.GetEncoding("Windows-1255").GetString(bytes));
-                    //if(tempStringForNode.Length > 0)
-                    //{
-                        //counter++;
-                    Console.Write(tempNameOfTeam1);
+                    if(tempStringForNode.Length > 0)
+                    {
+                        counter++;
+                        Console.Write(tempStringForNode);
                         //var node_temp = node.SelectSingleNode($"//*[@class='{"price price_147248478 priced"}']");
                         //var num = node.SelectSingleNode($"//*[@class='{"formatted_price"}']");
-                        
-                        //if (counter == 1)
-                        //{
-                    Console.Write(tempNameOfTeams[0].SelectSingleNode($"*[@class='{classValueRtaio}']").InnerText);
-                    Console.Write(" vs ");
-                    Console.Write(tempNameOfTeam2);
-                    //}
-                    //else if (counter == 2)
-                    //{
-                    Console.Write(tempNameOfTeams[1].SelectSingleNode($"*[@class='{classValueRtaio}']").InnerText);
-                    Console.WriteLine("");
-                            //counter = 0;
-                           
-                        //}
-                    //}
-                  
+
+                        if (counter == 1)
+                        {
+                            Console.Write(nodeRatioss[i].InnerText);
+                            Console.Write(" vs ");
+                        }
+                        else if (counter == 2)
+                        {
+                            Console.Write(nodeRatioss[i].InnerText);
+                            Console.WriteLine("");
+                            counter = 0;
+
+                        }
+                    }
+
                 }
-                
+
 
                 Console.WriteLine("\r\nPlease press a key...");
                 Console.ReadKey();
