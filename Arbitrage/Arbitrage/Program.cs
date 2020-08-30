@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using Arbitrage;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -31,7 +32,6 @@ namespace WebScraper
 
                 //web.OverrideEncoding = Encoding.GetEncoding(862);
                 var doc = web.Load(url);
-                Console.Write(doc.GetType());
 
                 //Get the content from a file
                 //var path = "countries.html";
@@ -50,6 +50,7 @@ namespace WebScraper
                 int counter = 0;
                 int j;
 
+                /*
                 for(int i = 0; i < nodesTeamNames.Count; i++)
                 {
                     StringBuilder tempStringForNode = new StringBuilder();
@@ -89,6 +90,18 @@ namespace WebScraper
                         }
                     }
 
+                }
+                */
+
+                for (int i = 0; i < nodesTeamNames.Count; i += 3)
+                {
+                    string tempNameOfFirstTeam = UI.ArrangeHebStringToBeHebUICustomize(nodesTeamNames[i].Attributes["title"].Value);
+                    string tempNameOfSecondTeam = UI.ArrangeHebStringToBeHebUICustomize(nodesTeamNames[i + 2].Attributes["title"].Value);
+
+                    float tempRatioOfFirstTeam = float.Parse(nodeRatioss[i].InnerText);
+                    float tempRatioOfSecondTeam = float.Parse(nodeRatioss[i + 2].InnerText);
+
+                    Console.WriteLine(tempNameOfFirstTeam + " " + tempRatioOfFirstTeam + " " + tempNameOfSecondTeam + " " + tempRatioOfSecondTeam);
                 }
 
 

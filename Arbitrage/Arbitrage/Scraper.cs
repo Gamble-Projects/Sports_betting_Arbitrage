@@ -5,7 +5,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace Arbitrage
 {
-    abstract class Scraper
+    abstract public class Scraper
     {
         private readonly string r_WebsiteUrl;
         private readonly HtmlWeb r_HtmlWeb;
@@ -34,6 +34,6 @@ namespace Arbitrage
         }
 
         abstract public void LoadUrl(); // throw Exception/event in case of connection not good
-        abstract public List<FootballMatch> MakeListOfDailyMatchesPlaying(); // if:m_HtmlDocument is not empty
+        abstract public List<FootballMatch> MakeListOfDailyMatchesPlaying();
     }
 }

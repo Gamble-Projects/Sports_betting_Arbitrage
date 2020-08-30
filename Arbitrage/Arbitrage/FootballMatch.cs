@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Arbitrage
 {
-    class FootballMatch
+    public class FootballMatch
     {
+        public FootballMatch(string a, int b, string c, int d)
+        {
+
+        }
     }
 }
