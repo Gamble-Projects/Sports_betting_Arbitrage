@@ -30,9 +30,9 @@ namespace Arbitrage
         public static string ArrangeHebStringToBeHebUICustomize(string UnArrangeHebString)
         {
             StringBuilder tempString = new StringBuilder();
-            Array arrayOFUnArrangeHebStringReversed = UnArrangeHebString.Reverse().ToArray();
+            Array arrayOfUnArrangeHebStringReversed = UnArrangeHebString.Reverse().ToArray();
 
-            foreach (char c in arrayOFUnArrangeHebStringReversed)
+            foreach (char c in arrayOfUnArrangeHebStringReversed)
             {
                 if (m_hebWord.ContainsKey(c))
                 {
