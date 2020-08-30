@@ -11,14 +11,12 @@ namespace WebScraper
 {
     class Program
     {
-        private static Dictionary<char, char> m_hebWord = new Dictionary<char, char>();
-
+        private readonly static Dictionary<char, char> m_hebWord = new Dictionary<char, char>();
         static void Main(string[] args)
         {
             Console.OutputEncoding = Encoding.GetEncoding("Windows-1255");
             makeDictOfHebWord();
             WebDataScrap();
-            
         }
 
         public static void WebDataScrap()
@@ -45,51 +43,55 @@ namespace WebScraper
                                 .ForEach(n => n.Remove());
 
                 //const string classValue = "name ellipsis outcomedescription";
-                const string MainTable = "rollup market_type market_type_id_1 period_id_100 win_draw_win multi_event game_type rollup-down";
+                const string classGame = "event-content sport_FOOT";
                 const string classValueTeamName = "title ";
                 const string classValueRtaio = "formatted_price";
-                HtmlNodeCollection nodesTeamNames = doc.DocumentNode.SelectNodes($"//*[@class='{classValueTeamName}']");
-                HtmlNodeCollection nodeRatioss = doc.DocumentNode.SelectNodes($"//*[@class='{classValueRtaio}']") ;
+                const string classStats = "statistics";
+                const string classStatsURL = "stats-popup";
+                HtmlNodeCollection nodesTeamNames = doc.DocumentNode.SelectNodes($"//*[@class='{"event"}']");
                 int counter = 0;
                 
-                for(int i = 0; i < nodesTeamNames.Count; i++)
+                foreach(var node in nodesTeamNames)
                 {
+                    Console.WriteLine(node.GetType());
                     StringBuilder tempStringForNode = new StringBuilder();
-                    Array tempNameOfTeam = nodesTeamNames[i].Attributes["title"].Value.Reverse().ToArray();
-                   
-                    //Array tempNameOfTeam = node.InnerText.Reverse().ToArray();
-
-                    foreach (char c in tempNameOfTeam)
-                    {
-                        if (m_hebWord.ContainsKey(c))
-                        {
-                            tempStringForNode.Append(c);
-                        }
-                    }
+                    var tempNameOfTeams = node.SelectNodes($"td/table/tbody/tr/td/div/div[@class='{classValueTeamName}']");
+                
+                    Array tempNameOfTeam1 = tempNameOfTeams[0].Attributes["title"].Value.Reverse().ToArray();
+                    Array tempNameOfTeam2 = tempNameOfTeams[2].Attributes["title"].Value.Reverse().ToArray();
+                   // foreach (char c in tempNameOfTeam)
+                    //{
+                      //  if (m_hebWord.ContainsKey(c))
+                        //{
+                          //  tempStringForNode.Append(c);
+                            
+                        //}
+                    //}
                     
                     //byte [] bytes = Encoding.GetEncoding(862).GetBytes(node.InnerText);
                     //Console.WriteLine("אבא שלכם זונה");
                     //Console.WriteLine(Encoding.GetEncoding("Windows-1255").GetString(bytes));
-                    if(tempStringForNode.Length > 0)
-                    {
-                        counter++;
-                        Console.Write(tempStringForNode);
+                    //if(tempStringForNode.Length > 0)
+                    //{
+                        //counter++;
+                    Console.Write(tempNameOfTeam1);
                         //var node_temp = node.SelectSingleNode($"//*[@class='{"price price_147248478 priced"}']");
                         //var num = node.SelectSingleNode($"//*[@class='{"formatted_price"}']");
                         
-                        if (counter == 1)
-                        {
-                            Console.Write(nodeRatioss[i].InnerText);
-                            Console.Write(" vs ");
-                        }
-                        else if (counter == 2)
-                        {
-                            Console.Write(nodeRatioss[i].InnerText);
-                            Console.WriteLine("");
-                            counter = 0;
+                        //if (counter == 1)
+                        //{
+                    Console.Write(tempNameOfTeams[0].SelectSingleNode($"*[@class='{classValueRtaio}']").InnerText);
+                    Console.Write(" vs ");
+                    Console.Write(tempNameOfTeam2);
+                    //}
+                    //else if (counter == 2)
+                    //{
+                    Console.Write(tempNameOfTeams[1].SelectSingleNode($"*[@class='{classValueRtaio}']").InnerText);
+                    Console.WriteLine("");
+                            //counter = 0;
                            
-                        }
-                    }
+                        //}
+                    //}
                   
                 }
                 
