@@ -14,7 +14,7 @@ namespace Arbitrage
             return ((1 / odd) * 100);
         }
 
-        private static bool isArbitrage(ref FootballMatch match)
+        public static bool isArbitrage(ref FootballMatch match)
         {
             bool v_IsArbitrage;
 
@@ -32,4 +32,3 @@ namespace Arbitrage
         }
     }
 }
-    
