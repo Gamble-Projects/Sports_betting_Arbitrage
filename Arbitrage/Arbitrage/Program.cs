@@ -10,6 +10,21 @@ using System.Text.RegularExpressions;
 
 namespace WebScraper
 {
+    public class Program
+    {
+        public static void Main() {
+            SystemManager manager = new SystemManager();
+
+            ScraperWinner winner = new ScraperWinner("https://www.winner.co.il/mainbook/sport-%D7%9B%D7%93%D7%95%D7%A8%D7%92%D7%9C?&marketTypePeriod=1%7C100");
+
+            manager.AddScraperToDict(winner);
+
+            manager.DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
+
+            Console.ReadLine();
+        }
+    }
+    /*
     class Program
     {
         private static Dictionary<char, char> m_hebWord = new Dictionary<char, char>();
@@ -50,7 +65,7 @@ namespace WebScraper
                 int counter = 0;
                 int j;
 
-                /*
+                
                 for(int i = 0; i < nodesTeamNames.Count; i++)
                 {
                     StringBuilder tempStringForNode = new StringBuilder();
@@ -91,7 +106,7 @@ namespace WebScraper
                     }
 
                 }
-                */
+                
 
                 for (int i = 0; i < nodesTeamNames.Count; i += 3)
                 {
@@ -124,5 +139,5 @@ namespace WebScraper
 
         }
     }
-
+*/
 }

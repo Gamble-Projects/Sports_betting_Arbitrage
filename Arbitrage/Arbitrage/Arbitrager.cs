@@ -9,7 +9,7 @@ namespace Arbitrage
 {
     public static class Arbitrager
     {
-        private static int CalculateIAP(int odd)
+        private static float CalculateIAP(float odd)
         {
             return ((1 / odd) * 100);
         }
@@ -20,7 +20,7 @@ namespace Arbitrage
 
             match.FirstTeamIAP = CalculateIAP(match.FirstTeamRatio);
             match.SecondTeamIAP = CalculateIAP(match.SecondTeamRatio);
-            v_IsArbitrage = (match.FirstTeamIAP + match.SecondTeamIAP) > 100;
+            v_IsArbitrage = (match.FirstTeamIAP + match.SecondTeamIAP) < 100;
 
             return v_IsArbitrage;
         }
