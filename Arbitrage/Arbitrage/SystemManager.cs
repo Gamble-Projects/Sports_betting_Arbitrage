@@ -8,15 +8,15 @@ namespace Arbitrage
     {
         // key = url, value = scraper
         private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>();
-        private readonly Quartz.SchedulerBuilder r_Scheduler;
 
-        public bool AddScraperToDict(Scraper i_NewScraper) {
+        public bool AddScraperToDict(Scraper i_NewScraper)
+        {
             bool v_ScraperAdded = false;
 
             // get connection
-            i_NewScraper.LoadUrl();
+            //i_NewScraper.LoadUrl();
             //add event
-            i_NewScraper.AddActionDelegate(new EventsForSystemManager().OnFailConnection);
+            i_NewScraper.AddActionDelegate(this.OnFailConnection);
             // add to dict
             r_Scrapers.Add(i_NewScraper.WebsiteUrl, i_NewScraper);
 
@@ -40,35 +40,42 @@ namespace Arbitrage
 
             foreach (Scraper scraper in r_Scrapers.Values)
             {
-                List<FootballMatch> FootballMatchesFromScraper = scraper.MakeListOfDailyMatchesPlaying();
-
-                foreach(FootballMatch match in FootballMatchesFromScraper)
+                try
                 {
-                    FootballMatch tempMatch = match;
+                    scraper.LoadUrl();
+                    List<FootballMatch> FootballMatchesFromScraper = scraper.MakeListOfDailyMatchesPlaying();
 
-                    if (Arbitrager.isArbitrage(ref tempMatch) == true)
+                    foreach (FootballMatch match in FootballMatchesFromScraper)
                     {
-                        Arbitrager.GamblingRatio(ref tempMatch);
-                        tempMatch.MatchStats = scraper.StatsCollector(tempMatch.StatsUrl);
-                        footballMatchesToBetOn.Add(tempMatch);
-                    }
-                }
+                        FootballMatch tempMatch = match;
 
-                foreach(FootballMatch match in footballMatchesToBetOn)
-                {
-                    Console.WriteLine(match.FirstTeam + " " + match.FirstTeamGamble + " " + match.SecondTeam +  " " + match.SecondTeamGamble);
-                    Console.WriteLine(match.MatchStats);
+                        if (Arbitrager.isArbitrage(ref tempMatch) == true)
+                        {
+                            Arbitrager.GamblingRatio(ref tempMatch);
+                            tempMatch.MatchStats = scraper.StatsCollector(tempMatch.StatsUrl);
+                            footballMatchesToBetOn.Add(tempMatch);
+                        }
+                    }
+
+                    foreach (FootballMatch match in footballMatchesToBetOn)
+                    {
+                        Console.WriteLine(match.FirstTeam + " " + match.FirstTeamGamble + " " + match.SecondTeam + " " + match.SecondTeamGamble);
+                        Console.WriteLine(match.MatchStats);
+                    }
+                    // bet/send message/dont know on arbitrage game (footballMatchesToBetOn)
                 }
-                // bet/send message/dont know on arbitrage game (footballMatchesToBetOn)
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
             }
         }
-    }
 
-    public class EventsForSystemManager
-    {
-        public void OnFailConnection()
+        public void OnFailConnection(object sender, string i_Url)
         {
-            //r_Scrapers.Remove(i_Url);
+
+            Console.WriteLine(i_Url + " Scraper couldn't connect and have been removed.");
+            r_Scrapers.Remove(i_Url);
         }
     }
 }

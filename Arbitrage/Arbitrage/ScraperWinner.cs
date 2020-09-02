@@ -14,25 +14,6 @@ namespace Arbitrage
         {
         }
 
-        override public void AddActionDelegate(ScraperConnectionDelegate ActionDelegate)
-        {
-            ToDoWhenFailConnection += ActionDelegate;
-        }
-
-        // To-Do : throw Exception/event in case of connection not good
-        public override void LoadUrl()
-        {
-            try
-            {
-                HtmlDocument = HtmlWeb.Load(WebsiteUrl);
-            }
-            catch
-            {
-                //ToDoWhenFailConnection.Invoke();
-            }
-            //throw new NotImplementedException();
-        }
-
         public override List<FootballMatch> MakeListOfDailyMatchesPlaying()
         {
             List<FootballMatch> listOfDayMatches = new List<FootballMatch>();
@@ -70,20 +51,20 @@ namespace Arbitrage
 
         override public string StatsCollector(string m_StatsUrl)
         {
-            HtmlWeb web1 = new HtmlWeb();
-            HtmlDocument doc1 = web1.Load(m_StatsUrl);
-            doc1.DocumentNode.Descendants().Where(n => n.Name == "script").ToList().ForEach(n => n.Remove());
-
             try
             {
+                HtmlWeb web1 = new HtmlWeb();
+                HtmlDocument doc1 = web1.Load(m_StatsUrl);
+                doc1.DocumentNode.Descendants().Where(n => n.Name == "script").ToList().ForEach(n => n.Remove());
+
                 HtmlNodeCollection nodesTeamNames1 = doc1.DocumentNode.SelectNodes($"//p[@class='{"text-center"}']");
                 HtmlNodeCollection nodesTeamNames2 = doc1.DocumentNode.SelectNodes($"//div[@class='{"size-s graphics-text-primary-color"}']");
 
                 if (nodesTeamNames1[2].InnerText != "0")
                 {
-                    Console.WriteLine(UI.ArrangeHebStringToBeHebUICustomize("נגמרו בתיקו. ") + nodesTeamNames2[0].InnerText[0] + UI.ArrangeHebStringToBeHebUICustomize( "משחקים,מתוכם " )+ nodesTeamNames1[2].InnerText + UI.ArrangeHebStringToBeHebUICustomize("הקבוצות שיחקו"));
+                    Console.WriteLine(UI.ArrangeHebStringToBeHebUICustomize("נגמרו בתיקו. ") + nodesTeamNames2[0].InnerText[0] + UI.ArrangeHebStringToBeHebUICustomize("משחקים,מתוכם ") + nodesTeamNames1[2].InnerText + UI.ArrangeHebStringToBeHebUICustomize("הקבוצות שיחקו"));
 
-                    return (UI.ArrangeHebStringToBeHebUICustomize("נגמרו בתיקו. " + nodesTeamNames2[0].InnerText[0] + "משחקים,מתוכם " + nodesTeamNames1[2].InnerText + "הקבוצות שיחקו"));
+                    return (UI.ArrangeHebStringToBeHebUICustomize(" נגמרו בתיקו. " + nodesTeamNames2[0].InnerText[0] + " משחקים, מתוכם " + nodesTeamNames1[2].InnerText + " הקבוצות שיחקו"));
                 }
                 else
                 {
@@ -94,21 +75,11 @@ namespace Arbitrage
             {
                 return " ";
             }
-        }
-
-        internal override void OnFailConnection(string i_Url)
-        {
-            /*
-            // lets tell the form that I was clicked:
-            if (ToDoWhenFailConnection != null)
+            catch(Exception e)
             {
-                ToDoWhenFailConnection.Invoke();
+                Console.WriteLine("an Error Ocuured When Trying To Connect to: " + m_StatsUrl);
+                return " ";
             }
-            else
-            {
-                Console.WriteLine(i_Url + "Has No Action On Fail Connection");
-            }
-            */
         }
     }
 }

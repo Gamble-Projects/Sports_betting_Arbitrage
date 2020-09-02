@@ -10,7 +10,7 @@ namespace Arbitrage
         private readonly string r_WebsiteUrl;
         private readonly HtmlWeb r_HtmlWeb;
         private HtmlDocument m_HtmlDocument;
-        public delegate void ScraperConnectionDelegate();
+        public delegate void ScraperConnectionDelegate(object sender, string i_Url);
         public event ScraperConnectionDelegate m_ToDoWhenFailConnection;
 
         public string WebsiteUrl
@@ -41,11 +41,42 @@ namespace Arbitrage
             remove { m_ToDoWhenFailConnection -= value; }
         }
 
+        public void OnFailConnection(object sender, string i_Url)
+        {
+            // lets tell the form that I was clicked:
+            if (m_ToDoWhenFailConnection != null)
+            {
+                m_ToDoWhenFailConnection.Invoke(this, i_Url);
+            }
+            else
+            {
+                Console.WriteLine(i_Url + "Has No Action On Fail Connection");
+            }
+        }
 
-        abstract public void LoadUrl(); // throw Exception/event in case of connection not good
+        public void AddActionDelegate(ScraperConnectionDelegate ActionDelegate)
+        {
+            ToDoWhenFailConnection += ActionDelegate;
+        }
+
+        // To-Do : throw Exception/event in case of connection not good
+        public void LoadUrl()
+        {
+            try
+            {
+                HtmlDocument = HtmlWeb.Load(WebsiteUrl);
+            }
+            catch
+            {
+                m_ToDoWhenFailConnection.Invoke(this, this.r_WebsiteUrl);
+                throw new Exception(WebsiteUrl + " were unable to connect to server");
+            }
+            //throw new NotImplementedException();
+        }
+
+        //abstract public void LoadUrl(); // throw Exception/event in case of connection not good
         abstract public List<FootballMatch> MakeListOfDailyMatchesPlaying();
-        abstract internal void OnFailConnection(string i_Url);
         abstract public string StatsCollector(string m_StatsUrl);
-        abstract public void AddActionDelegate(ScraperConnectionDelegate ActionDelegate);
+        //abstract public void AddActionDelegate(ScraperConnectionDelegate ActionDelegate);
     }
 }

@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Arbitrager.cs" />
     <Compile Include="FootballMatch.cs" />
+    <Compile Include="JobExecuter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Scraper.cs" />
     <Compile Include="ScraperWinner.cs" />
