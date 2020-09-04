@@ -18,7 +18,6 @@ namespace WebScraper
             ScraperWinner winner = new ScraperWinner("https://www.winner.co.il/mainbook/sport-%D7%9B%D7%93%D7%95%D7%A8%D7%92%D7%9C?&marketTypePeriod=1%7C100");
 
             manager.AddScraperToDict(winner);
-
             manager.DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
 
             Console.ReadLine();

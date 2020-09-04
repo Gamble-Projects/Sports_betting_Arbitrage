@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Quartz;
-
+using Quartz.Jobs;
 namespace Arbitrage
 {
     public class SystemManager
     {
         // key = url, value = scraper
         private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>();
+        private IScheduler m_schedueler;
 
         public bool AddScraperToDict(Scraper i_NewScraper)
         {
@@ -71,11 +72,24 @@ namespace Arbitrage
             }
         }
 
+        public async void StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage() {
+            IJobDetail jobDetail = JobBuilder.Create<JobExecuter>()
+                .WithIdentity("Arbitrager", "DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage")
+                .Build();
+
+            ITrigger trigger = TriggerBuilder.Create()
+                .WithIdentity("Arbitrager", "DailyBasis")
+                .StartNow()
+                .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(5))
+                .Build();
+
+            await m_schedueler.ScheduleJob(jobDetail, trigger);
+        }
+
         public void OnFailConnection(object sender, string i_Url)
         {
-
             Console.WriteLine(i_Url + " Scraper couldn't connect and have been removed.");
-            r_Scrapers.Remove(i_Url);
+            Console.WriteLine(string.Format($"To Remove The scraper use RemoveScraperToDict({0})", i_Url));
         }
     }
 }

@@ -66,8 +66,9 @@ namespace Arbitrage
             {
                 HtmlDocument = HtmlWeb.Load(WebsiteUrl);
             }
-            catch
+            catch(Exception e)
             {
+                Console.WriteLine("an Error Occured: " + e.Message);
                 m_ToDoWhenFailConnection.Invoke(this, this.r_WebsiteUrl);
                 throw new Exception(WebsiteUrl + " were unable to connect to server");
             }

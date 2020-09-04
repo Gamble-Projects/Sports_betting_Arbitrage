@@ -9,7 +9,7 @@ namespace Arbitrage
         public async Task Execute(IJobExecutionContext context)
         {
             var message = $"JobExecuter executed at ${DateTime.Now.ToString()}";
-            Console.WriteLine(message);
+            System.Diagnostics.Debug.WriteLine(message);
         }
     }
 }

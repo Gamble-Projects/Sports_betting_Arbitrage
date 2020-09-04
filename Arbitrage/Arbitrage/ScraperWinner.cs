@@ -62,9 +62,7 @@ namespace Arbitrage
 
                 if (nodesTeamNames1[2].InnerText != "0")
                 {
-                    Console.WriteLine(UI.ArrangeHebStringToBeHebUICustomize("נגמרו בתיקו. ") + nodesTeamNames2[0].InnerText[0] + UI.ArrangeHebStringToBeHebUICustomize("משחקים,מתוכם ") + nodesTeamNames1[2].InnerText + UI.ArrangeHebStringToBeHebUICustomize("הקבוצות שיחקו"));
-
-                    return (UI.ArrangeHebStringToBeHebUICustomize(" נגמרו בתיקו. " + nodesTeamNames2[0].InnerText[0] + " משחקים, מתוכם " + nodesTeamNames1[2].InnerText + " הקבוצות שיחקו"));
+                    return UI.ArrangeHebStringToBeHebUICustomize(" נגמרו בתיקו. ") + nodesTeamNames2[0].InnerText[0] + UI.ArrangeHebStringToBeHebUICustomize(" משחקים, מתוכם ") + nodesTeamNames1[2].InnerText + UI.ArrangeHebStringToBeHebUICustomize(" הקבוצות שיחקו");
                 }
                 else
                 {
