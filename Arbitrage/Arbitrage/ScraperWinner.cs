@@ -71,11 +71,12 @@ namespace Arbitrage
             }
             catch (NullReferenceException e)
             {
+                Console.WriteLine("an Error Ocuured When Trying To Connect to: " + m_StatsUrl + Environment.NewLine + e.Message);
                 return " ";
             }
             catch(Exception e)
             {
-                Console.WriteLine("an Error Ocuured When Trying To Connect to: " + m_StatsUrl);
+                Console.WriteLine("an Error Ocuured When Trying To Connect to: " + m_StatsUrl + Environment.NewLine + e.Message);
                 return " ";
             }
         }

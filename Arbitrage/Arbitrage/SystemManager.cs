@@ -1,15 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Quartz;
-using Quartz.Jobs;
+using Quartz.Impl;
+
 namespace Arbitrage
 {
     public class SystemManager
     {
         // key = url, value = scraper
+        private readonly List<string> m_NotConnectedUrl = new List<string>();
         private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>();
         private IScheduler m_schedueler;
 
+        public SystemManager()
+        {
+            m_schedueler = this.SchedulerConfig();
+            StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
+        }
         public bool AddScraperToDict(Scraper i_NewScraper)
         {
             bool v_ScraperAdded = false;
@@ -20,7 +30,7 @@ namespace Arbitrage
             i_NewScraper.AddActionDelegate(this.OnFailConnection);
             // add to dict
             r_Scrapers.Add(i_NewScraper.WebsiteUrl, i_NewScraper);
-
+            Console.WriteLine("at add scraper");
             return v_ScraperAdded;
         }
 
@@ -29,8 +39,16 @@ namespace Arbitrage
             bool v_ScraperBeenRemoved = false;
 
             // find i_Url
+            if (r_Scrapers.ContainsKey(i_Url) == true)
+            {
+                r_Scrapers.Remove(i_Url);
+            }
+            else
+            {
+                Console.WriteLine("couldnt find " + i_Url);
+            }
             // remove from dictionary
-
+            Console.WriteLine("at remove scraper");
             return v_ScraperBeenRemoved;
         }
 
@@ -38,7 +56,7 @@ namespace Arbitrage
         public void DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage()
         {
             List<FootballMatch> footballMatchesToBetOn = new List<FootballMatch>();
-
+            Console.WriteLine("at list matches");
             foreach (Scraper scraper in r_Scrapers.Values)
             {
                 try
@@ -72,6 +90,7 @@ namespace Arbitrage
             }
         }
 
+        // in video youtube return Task<IActionResult> (https://www.youtube.com/watch?v=4HPY3Mk5TsA&list=PLSi1BNmQ61ZohCcl43UdAksg7X3_TSmly&index=9)
         public async void StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage() {
             IJobDetail jobDetail = JobBuilder.Create<JobExecuter>()
                 .WithIdentity("Arbitrager", "DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage")
@@ -80,16 +99,43 @@ namespace Arbitrage
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity("Arbitrager", "DailyBasis")
                 .StartNow()
-                .WithSimpleSchedule(x => x.WithIntervalInSeconds(5).WithRepeatCount(5))
+                .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 56)).EndingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 59)).WithIntervalInMinutes(1))
                 .Build();
 
             await m_schedueler.ScheduleJob(jobDetail, trigger);
+
+            //return RedirectToAction("index");
+        }
+
+        public Quartz.IScheduler SchedulerConfig()
+        {
+            NameValueCollection props = new NameValueCollection {
+            { "quartz.serializer.type","binary"}
+        };
+
+            StdSchedulerFactory factory = new StdSchedulerFactory(props);
+
+            var scheduler = factory.GetScheduler().Result;
+
+            scheduler.Start().Wait();
+
+            return scheduler;
+        }
+
+        private void OnShutdown()
+        {
+            if (m_schedueler.IsShutdown == false)
+            {
+                m_schedueler.Shutdown();
+            }
         }
 
         public void OnFailConnection(object sender, string i_Url)
         {
-            Console.WriteLine(i_Url + " Scraper couldn't connect and have been removed.");
-            Console.WriteLine(string.Format($"To Remove The scraper use RemoveScraperToDict({0})", i_Url));
+            Console.WriteLine(i_Url + " Scraper couldn't connect and have been removed."+ Environment.NewLine +
+                "you can find the unable to connect url on NotConnectedUrl List");
+            m_NotConnectedUrl.Add(i_Url);
+            this.RemoveScraperToDict(i_Url);
         }
     }
 }

@@ -69,10 +69,14 @@ namespace Arbitrage
             catch(Exception e)
             {
                 Console.WriteLine("an Error Occured: " + e.Message);
-                m_ToDoWhenFailConnection.Invoke(this, this.r_WebsiteUrl);
+
+                if (e is System.UriFormatException)
+                {
+                    m_ToDoWhenFailConnection.Invoke(this, this.r_WebsiteUrl);
+                }
+
                 throw new Exception(WebsiteUrl + " were unable to connect to server");
             }
-            //throw new NotImplementedException();
         }
 
         //abstract public void LoadUrl(); // throw Exception/event in case of connection not good

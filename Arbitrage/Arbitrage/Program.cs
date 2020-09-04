@@ -1,24 +1,22 @@
 ﻿using Arbitrage;
 using HtmlAgilityPack;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Text.RegularExpressions;
+using Quartz;
+using System.Collections.Specialized;
+using Quartz.Impl;
 
 namespace WebScraper
 {
     public class Program
     {
-        public static void Main() {
+        public static void Main()
+        {
             SystemManager manager = new SystemManager();
 
             ScraperWinner winner = new ScraperWinner("https://www.winner.co.il/mainbook/sport-%D7%9B%D7%93%D7%95%D7%A8%D7%92%D7%9C?&marketTypePeriod=1%7C100");
 
             manager.AddScraperToDict(winner);
-            manager.DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
+            //manager.DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
 
             Console.ReadLine();
         }
@@ -64,7 +62,7 @@ namespace WebScraper
                 int counter = 0;
                 int j;
 
-                
+
                 for(int i = 0; i < nodesTeamNames.Count; i++)
                 {
                     StringBuilder tempStringForNode = new StringBuilder();
@@ -105,7 +103,7 @@ namespace WebScraper
                     }
 
                 }
-                
+
 
                 for (int i = 0; i < nodesTeamNames.Count; i += 3)
                 {
