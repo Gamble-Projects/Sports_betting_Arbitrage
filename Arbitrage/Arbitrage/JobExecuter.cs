@@ -9,11 +9,53 @@ namespace Arbitrage
 {
     public class JobExecuter : IJob
     {
-        public async Task Execute(IJobExecutionContext context)
+        
+        private void writeTimeAndDateToDebug()
         {
             var message = $"JobExecuter executed at ${DateTime.Now.ToString()}";
             System.Diagnostics.Debug.WriteLine(message);
             Console.WriteLine("here");
+        }
+        
+        public async Task Execute(IJobExecutionContext context)
+        {
+            writeTimeAndDateToDebug();
+
+            Dictionary<string, Scraper> Scrapers = (Dictionary<string, Scraper>)context.JobDetail.JobDataMap.Get("DictOfScraper");
+            List<FootballMatch> footballMatchesToBetOn = new List<FootballMatch>();
+            Console.WriteLine("at list matches");
+
+            foreach (Scraper scraper in Scrapers.Values)
+            {
+                try
+                {
+                    scraper.LoadUrl();
+                    List<FootballMatch> FootballMatchesFromScraper = scraper.MakeListOfDailyMatchesPlaying();
+
+                    foreach (FootballMatch match in FootballMatchesFromScraper)
+                    {
+                        FootballMatch tempMatch = match;
+
+                        if (Arbitrager.isArbitrage(ref tempMatch) == true)
+                        {
+                            Arbitrager.GamblingRatio(ref tempMatch);
+                            tempMatch.MatchStats = scraper.StatsCollector(tempMatch.StatsUrl);
+                            footballMatchesToBetOn.Add(tempMatch);
+                        }
+                    }
+
+                    foreach (FootballMatch match in footballMatchesToBetOn)
+                    {
+                        Console.WriteLine(match.FirstTeam + " " + match.FirstTeamGamble + " " + match.SecondTeam + " " + match.SecondTeamGamble);
+                        Console.WriteLine(match.MatchStats);
+                    }
+                    // bet/send message/dont know on arbitrage game (footballMatchesToBetOn)
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
         }
     }
 }

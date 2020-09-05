@@ -13,12 +13,16 @@ namespace Arbitrage
         // key = url, value = scraper
         private readonly List<string> m_NotConnectedUrl = new List<string>();
         private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>();
+        //private readonly List<JobExecuter> m_NotConnectedUrl
         private IScheduler m_schedueler;
+
 
         public SystemManager()
         {
             m_schedueler = this.SchedulerConfig();
             StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
+            string stam = Console.ReadLine();
+            Console.WriteLine(stam);
         }
         public bool AddScraperToDict(Scraper i_NewScraper)
         {
@@ -51,7 +55,7 @@ namespace Arbitrage
             Console.WriteLine("at remove scraper");
             return v_ScraperBeenRemoved;
         }
-
+        /*
         // Do This Daily Basis ????
         public void DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage()
         {
@@ -89,17 +93,19 @@ namespace Arbitrage
                 }
             }
         }
-
+        */
         // in video youtube return Task<IActionResult> (https://www.youtube.com/watch?v=4HPY3Mk5TsA&list=PLSi1BNmQ61ZohCcl43UdAksg7X3_TSmly&index=9)
         public async void StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage() {
             IJobDetail jobDetail = JobBuilder.Create<JobExecuter>()
                 .WithIdentity("Arbitrager", "DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage")
                 .Build();
 
+            jobDetail.JobDataMap.Put("DictOfScraper", this.r_Scrapers);
+
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity("Arbitrager", "DailyBasis")
                 .StartNow()
-                .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 56)).EndingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 59)).WithIntervalInMinutes(1))
+                .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(18, 21)).EndingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 59)).WithIntervalInMinutes(1))
                 .Build();
 
             await m_schedueler.ScheduleJob(jobDetail, trigger);
