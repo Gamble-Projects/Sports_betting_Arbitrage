@@ -10,20 +10,59 @@ namespace Arbitrage
 {
     public class SystemManager
     {
-        // key = url, value = scraper
-        private readonly List<string> m_NotConnectedUrl = new List<string>();
-        private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>();
-        //private readonly List<JobExecuter> m_NotConnectedUrl
-        private IScheduler m_schedueler;
+        public enum eMenu { 
+            Quit,
+            AddScraperToDict,
+            RemoveScraperFromDict,
+            PrintAllNotConnectedUrl,
+            StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage
+        }
 
+        private readonly List<string> m_NotConnectedUrl = new List<string>();
+        // key = url, value = scraper
+        private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>();
+        private IScheduler m_schedueler;
+        private static bool v_StartedSceduleForScraper = false;
 
         public SystemManager()
         {
             m_schedueler = this.SchedulerConfig();
-            StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
-            string stam = Console.ReadLine();
-            Console.WriteLine(stam);
         }
+
+        public void OpenSystemManagerForArbitrageFounder()
+        {
+            string[] menu;
+            int userChoise;
+
+            userChoise = UI.printMenuToUserToGetNextAction(menu);
+
+            while (userChoise != (int)eMenu.Quit)
+            {
+                if (userChoise == (int)eMenu.AddScraperToDict) {
+                    UI.GetScraperFromUser();
+                }
+                else if (userChoise == (int)eMenu.RemoveScraperFromDict) {
+                    UI.GetUrlToOfScraper();
+                }
+                else if (userChoise == (int)eMenu.PrintAllNotConnectedUrl) {
+                    UI.PrintListOfString();
+                }
+                else if (userChoise == (int)eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage) {
+                    if (v_StartedSceduleForScraper == false) {
+                        this.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
+                    }
+                    else {
+                        UI.PrintInvalidInput();
+                    }
+                }
+                else{
+                    UI.PrintInvalidInput();
+                }
+
+                userChoise = UI.printMenuToUserToGetNextAction(menu);
+            }
+        }
+
         public bool AddScraperToDict(Scraper i_NewScraper)
         {
             bool v_ScraperAdded = false;
@@ -38,7 +77,7 @@ namespace Arbitrage
             return v_ScraperAdded;
         }
 
-        public bool RemoveScraperToDict(string i_Url)
+        public bool RemoveScraperFromDict(string i_Url)
         {
             bool v_ScraperBeenRemoved = false;
 
@@ -96,6 +135,8 @@ namespace Arbitrage
         */
         // in video youtube return Task<IActionResult> (https://www.youtube.com/watch?v=4HPY3Mk5TsA&list=PLSi1BNmQ61ZohCcl43UdAksg7X3_TSmly&index=9)
         public async void StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage() {
+            v_StartedSceduleForScraper = true;
+
             IJobDetail jobDetail = JobBuilder.Create<JobExecuter>()
                 .WithIdentity("Arbitrager", "DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage")
                 .Build();
@@ -141,7 +182,7 @@ namespace Arbitrage
             Console.WriteLine(i_Url + " Scraper couldn't connect and have been removed."+ Environment.NewLine +
                 "you can find the unable to connect url on NotConnectedUrl List");
             m_NotConnectedUrl.Add(i_Url);
-            this.RemoveScraperToDict(i_Url);
+            this.RemoveScraperFromDict(i_Url);
         }
     }
 }

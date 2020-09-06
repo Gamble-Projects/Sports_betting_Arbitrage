@@ -16,6 +16,37 @@ namespace Arbitrage
             makeDictOfHebWord();
         }
 
+        public static int printMenuToUserToGetNextAction(string[] i_Menu)
+        {
+            int i = 0;
+            string inputFromUser;
+            int actionUserChose = 0;
+            bool v_ValidInput = false;
+
+            while (v_ValidInput == false)
+            {
+                foreach (string action in i_Menu)
+                {
+                    Console.WriteLine(string.Format($"To {0} press {1}"), action, i);
+                    i++;
+                }
+
+                inputFromUser = Console.ReadLine();
+
+                if (int.TryParse(inputFromUser, out actionUserChose) == true)
+                {
+                    v_ValidInput = true;
+                }
+                else
+                {
+                    Console.WriteLine("invalid Input");
+                    Console.Clear();
+                }
+            }
+
+            return actionUserChose;
+        }
+
         private static void makeDictOfHebWord()
         {
             string hebChar = " .ףץםןאבגדהוזחטיכלמנסעפצקרשת";
