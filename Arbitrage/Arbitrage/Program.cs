@@ -20,6 +20,7 @@ namespace WebScraper
             //manager.AddScraperToDict(winner);
             //manager.DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
 
+            Console.WriteLine("Arbitrager Scraper is Done Come Back Later");
             Console.ReadLine();
         }
     }

@@ -10,42 +10,59 @@ namespace Arbitrage
 {
     public class SystemManager
     {
-        public enum eMenu { 
+        public enum eMenu {
             Quit,
             AddScraperToDict,
             RemoveScraperFromDict,
+            PrintAllScrapers,
             PrintAllNotConnectedUrl,
             StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage
         }
 
-        private readonly List<string> m_NotConnectedUrl = new List<string>();
-        // key = url, value = scraper
-        private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>();
         private IScheduler m_schedueler;
+        private readonly List<string> m_NotConnectedUrl = new List<string>();
+        private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>(); // key = url, value = scraper
         private static bool v_StartedSceduleForScraper = false;
+        private readonly System.Text.StringBuilder m_menu = new System.Text.StringBuilder();
 
         public SystemManager()
         {
             m_schedueler = this.SchedulerConfig();
+            buildMenu();
+        }
+
+        private void buildMenu()
+        {
+            m_menu.AppendLine("Quit");
+            m_menu.AppendLine("Add Scraper");
+            m_menu.AppendLine("Remove Scraper");
+            m_menu.AppendLine("Print All Scrapers");
+            m_menu.AppendLine("Print All Not Connected URL");
+            m_menu.AppendLine("Start Daily Get All Football Match And Calculate Arbitrage");
         }
 
         public void OpenSystemManagerForArbitrageFounder()
         {
-            string[] menu;
             int userChoise;
 
-            userChoise = UI.printMenuToUserToGetNextAction(menu);
+            userChoise = UI.printMenuToUserToGetNextAction(m_menu);
 
             while (userChoise != (int)eMenu.Quit)
             {
+                m_menu.Remove(m_menu.Length-2, "Start Daily Get All Football Match And Calculate Arbitrage".Length);
+
                 if (userChoise == (int)eMenu.AddScraperToDict) {
-                    UI.GetScraperFromUser();
+                    getScraperFromUserAndAdd();
                 }
                 else if (userChoise == (int)eMenu.RemoveScraperFromDict) {
-                    UI.GetUrlToOfScraper();
+                    getUrlToOfScraper();
+                }
+                else if (userChoise == (int)eMenu.PrintAllScrapers)
+                {
+                    printAllScapers();
                 }
                 else if (userChoise == (int)eMenu.PrintAllNotConnectedUrl) {
-                    UI.PrintListOfString();
+                    printNotConnectedScapers();
                 }
                 else if (userChoise == (int)eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage) {
                     if (v_StartedSceduleForScraper == false) {
@@ -59,11 +76,11 @@ namespace Arbitrage
                     UI.PrintInvalidInput();
                 }
 
-                userChoise = UI.printMenuToUserToGetNextAction(menu);
+                userChoise = UI.printMenuToUserToGetNextAction(m_menu);
             }
         }
 
-        public bool AddScraperToDict(Scraper i_NewScraper)
+        private bool AddScraperToDict(Scraper i_NewScraper)
         {
             bool v_ScraperAdded = false;
 
@@ -73,25 +90,25 @@ namespace Arbitrage
             i_NewScraper.AddActionDelegate(this.OnFailConnection);
             // add to dict
             r_Scrapers.Add(i_NewScraper.WebsiteUrl, i_NewScraper);
-            Console.WriteLine("at add scraper");
             return v_ScraperAdded;
         }
 
-        public bool RemoveScraperFromDict(string i_Url)
+        private bool RemoveScraperFromDict(string i_Url)
         {
             bool v_ScraperBeenRemoved = false;
 
             // find i_Url
             if (r_Scrapers.ContainsKey(i_Url) == true)
             {
+                v_ScraperBeenRemoved = true;
                 r_Scrapers.Remove(i_Url);
             }
             else
             {
+                v_ScraperBeenRemoved = false;
                 Console.WriteLine("couldnt find " + i_Url);
             }
             // remove from dictionary
-            Console.WriteLine("at remove scraper");
             return v_ScraperBeenRemoved;
         }
         /*
@@ -134,7 +151,7 @@ namespace Arbitrage
         }
         */
         // in video youtube return Task<IActionResult> (https://www.youtube.com/watch?v=4HPY3Mk5TsA&list=PLSi1BNmQ61ZohCcl43UdAksg7X3_TSmly&index=9)
-        public async void StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage() {
+        private async void StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage() {
             v_StartedSceduleForScraper = true;
 
             IJobDetail jobDetail = JobBuilder.Create<JobExecuter>()
@@ -154,7 +171,7 @@ namespace Arbitrage
             //return RedirectToAction("index");
         }
 
-        public Quartz.IScheduler SchedulerConfig()
+        private Quartz.IScheduler SchedulerConfig()
         {
             NameValueCollection props = new NameValueCollection {
             { "quartz.serializer.type","binary"}
@@ -177,12 +194,57 @@ namespace Arbitrage
             }
         }
 
-        public void OnFailConnection(object sender, string i_Url)
+        private void OnFailConnection(object sender, string i_Url)
         {
             Console.WriteLine(i_Url + " Scraper couldn't connect and have been removed."+ Environment.NewLine +
                 "you can find the unable to connect url on NotConnectedUrl List");
             m_NotConnectedUrl.Add(i_Url);
             this.RemoveScraperFromDict(i_Url);
+        }
+
+        private void getScraperFromUserAndAdd()
+        {
+            Scraper userScraper = UI.CreateScraperWithUser();
+
+            if (userScraper != null)
+            {
+                this.AddScraperToDict(userScraper);
+            }
+        }
+
+        private void getUrlToOfScraper()
+        {
+            string urlFromUser = UI.GetInputFromUser("Please Enter the URL of the scraper you want to remove: ");
+            bool v_ScraperRemoved = this.RemoveScraperFromDict(urlFromUser);
+
+            if (v_ScraperRemoved == false)
+            {
+                UI.PrintInvalidInput();
+            }
+        }
+
+        private void printAllScapers()
+        {
+            System.Text.StringBuilder urlOfScrapers = new System.Text.StringBuilder();
+
+            foreach(string url in r_Scrapers.Keys)
+            {
+                urlOfScrapers.AppendLine(url);
+            }
+
+            UI.PrintString(urlOfScrapers.ToString());
+        }
+
+        private void printNotConnectedScapers()
+        {
+            System.Text.StringBuilder urlOfNotConnectedScrapers = new System.Text.StringBuilder();
+
+            foreach (string url in this.m_NotConnectedUrl)
+            {
+                urlOfNotConnectedScrapers.AppendLine(url);
+            }
+
+            UI.PrintString(urlOfNotConnectedScrapers.ToString());
         }
     }
 }
