@@ -10,14 +10,11 @@ namespace Arbitrage
         private static readonly string sr_HtmlClassValueForTeamName = "title ";
         private static readonly string sr_HtmlClassValueForRatio = "formatted_price";
 
-        public ScraperWinner(string WebsiteUrl) : base(WebsiteUrl)
-        {
-        }
+        public ScraperWinner(string WebsiteUrl) : base(WebsiteUrl){}
 
         public override List<FootballMatch> MakeListOfDailyMatchesPlaying()
         {
             List<FootballMatch> listOfDayMatches = new List<FootballMatch>();
-
 
             // To-Do : add exception handler
             try

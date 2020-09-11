@@ -204,7 +204,7 @@ namespace Arbitrage
 
         private void getScraperFromUserAndAdd()
         {
-            Scraper userScraper = UI.CreateScraperWithUser();
+            Scraper userScraper = UI.CreateNewScraperWithUser();
 
             if (userScraper != null)
             {

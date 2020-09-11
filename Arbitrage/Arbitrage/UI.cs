@@ -102,12 +102,15 @@ namespace Arbitrage
             return userInput;
         }
 
-        public static Scraper CreateScraperWithUser()
+        public static Scraper CreateNewScraperWithUser()
         {
             string urlOfScraper = UI.GetInputFromUser("Please Enter The URL of The New Scraper: ");
-            Scraper newScraper = new ScraperWinner(urlOfScraper);
+            Scraper newScraper = ScraperFactory.MakeNewScpraper(urlOfScraper);
 
-            //Console.WriteLine("TBA");
+            if(newScraper == null)
+            {
+                Console.WriteLine("The scraper you want to add wasn't been added");
+            }
 
             return newScraper;
         }
