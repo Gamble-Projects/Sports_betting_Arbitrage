@@ -17,7 +17,7 @@ namespace Arbitrage
 
         private static void buildMenu()
         {
-            m_Menu.AppendLine(eTypeOfScrapers.Winner.ToString());
+            m_Menu.Append(eTypeOfScrapers.Winner.ToString());
         }
 
         public enum eTypeOfScrapers

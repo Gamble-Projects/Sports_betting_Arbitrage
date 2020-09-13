@@ -24,13 +24,13 @@ namespace Arbitrage
             string inputFromUser;
             int actionUserChose = 0;
             bool v_ValidInput = false;
-            string[] arrOfMenu = i_Menu.ToString().Split('\n');
+            Array arrOfMenu = i_Menu.ToString().Split('\n');
 
             while (v_ValidInput == false)
             {
                 foreach (string action in arrOfMenu)
                 {
-                    Console.WriteLine(string.Format($"To {0} press {1}"), action, i);
+                    Console.WriteLine(string.Format(@"To {0} press {1}", action, i));
                     i++;
                 }
 
@@ -93,7 +93,7 @@ namespace Arbitrage
             string userInput = null;
             Console.WriteLine(i_MesssageToUser);
 
-            while (v_ValidInput)
+            while (v_ValidInput == false)
             {
                 userInput = Console.ReadLine();
                 v_ValidInput = userInput != string.Empty;

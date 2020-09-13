@@ -9,21 +9,19 @@ namespace Arbitrage
 {
     public class JobExecuter : IJob
     {
-        
+
         private void writeTimeAndDateToDebug()
         {
             var message = $"JobExecuter executed at ${DateTime.Now.ToString()}";
             System.Diagnostics.Debug.WriteLine(message);
-            Console.WriteLine("here");
         }
-        
+
         public async Task Execute(IJobExecutionContext context)
         {
             writeTimeAndDateToDebug();
 
             Dictionary<string, Scraper> Scrapers = (Dictionary<string, Scraper>)context.JobDetail.JobDataMap.Get("DictOfScraper");
             List<FootballMatch> footballMatchesToBetOn = new List<FootballMatch>();
-            Console.WriteLine("at list matches");
 
             foreach (Scraper scraper in Scrapers.Values)
             {

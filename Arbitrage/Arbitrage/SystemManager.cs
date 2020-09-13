@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Quartz;
@@ -28,17 +29,22 @@ namespace Arbitrage
         public SystemManager()
         {
             m_schedueler = this.SchedulerConfig();
-            buildMenu();
+            buildMainMenu();
         }
 
-        private void buildMenu()
+        private void buildMainMenu()
         {
-            m_menu.AppendLine("Quit");
-            m_menu.AppendLine("Add Scraper");
-            m_menu.AppendLine("Remove Scraper");
-            m_menu.AppendLine("Print All Scrapers");
-            m_menu.AppendLine("Print All Not Connected URL");
-            m_menu.AppendLine("Start Daily Get All Football Match And Calculate Arbitrage");
+            m_menu.Append("Quit");
+            m_menu.Append('\n');
+            m_menu.Append("Add Scraper");
+            m_menu.Append('\n');
+            m_menu.Append("Remove Scraper");
+            m_menu.Append('\n');
+            m_menu.Append("Print All Scrapers");
+            m_menu.Append('\n');
+            m_menu.Append("Print All Not Connected URL");
+            m_menu.Append('\n');
+            m_menu.Append("Start Daily Get All Football Match And Calculate Arbitrage");
         }
 
         public void OpenSystemManagerForArbitrageFounder()
@@ -49,8 +55,6 @@ namespace Arbitrage
 
             while (userChoise != (int)eMenu.Quit)
             {
-                m_menu.Remove(m_menu.Length-2, "Start Daily Get All Football Match And Calculate Arbitrage".Length);
-
                 if (userChoise == (int)eMenu.AddScraperToDict) {
                     getScraperFromUserAndAdd();
                 }
@@ -67,6 +71,7 @@ namespace Arbitrage
                 else if (userChoise == (int)eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage) {
                     if (v_StartedSceduleForScraper == false) {
                         this.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
+                        m_menu.Remove(m_menu.Length - "Start Daily Get All Football Match And Calculate Arbitrage".Length - 3, "Start Daily Get All Football Match And Calculate Arbitrage".Length + 3);
                     }
                     else {
                         UI.PrintInvalidInput();
@@ -163,7 +168,7 @@ namespace Arbitrage
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity("Arbitrager", "DailyBasis")
                 .StartNow()
-                .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(18, 21)).EndingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 59)).WithIntervalInMinutes(1))
+                .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(00, 21)).EndingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 59)).WithIntervalInMinutes(1))
                 .Build();
 
             await m_schedueler.ScheduleJob(jobDetail, trigger);
@@ -214,12 +219,24 @@ namespace Arbitrage
 
         private void getUrlToOfScraper()
         {
-            string urlFromUser = UI.GetInputFromUser("Please Enter the URL of the scraper you want to remove: ");
-            bool v_ScraperRemoved = this.RemoveScraperFromDict(urlFromUser);
+            System.Text.StringBuilder menuOfUrlToRempove = new System.Text.StringBuilder();
+            buildMenuOfUrlToRemove(menuOfUrlToRempove);
+            int urlToRemove = UI.printMenuToUserToGetNextAction(menuOfUrlToRempove);
+
+            bool v_ScraperRemoved = this.RemoveScraperFromDict(this.r_Scrapers[]);
 
             if (v_ScraperRemoved == false)
             {
                 UI.PrintInvalidInput();
+            }
+        }
+
+        private void buildMenuOfUrlToRemove(StringBuilder menuOfUrlToRempove)
+        {
+            foreach(string url in this.r_Scrapers.Keys)
+            {
+                menuOfUrlToRempove.Append("Remove" + url);
+                menuOfUrlToRempove.Append('\n');
             }
         }
 
