@@ -82,6 +82,8 @@ namespace Arbitrage
         //abstract public void LoadUrl(); // throw Exception/event in case of connection not good
         abstract public List<FootballMatch> MakeListOfDailyMatchesPlaying();
         abstract public string StatsCollector(string m_StatsUrl);
+        abstract public string ToString();
+        abstract public int GetHashCode();
         //abstract public void AddActionDelegate(ScraperConnectionDelegate ActionDelegate);
     }
 }

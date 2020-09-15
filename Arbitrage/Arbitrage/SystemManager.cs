@@ -24,54 +24,38 @@ namespace Arbitrage
         private readonly List<string> m_NotConnectedUrl = new List<string>();
         private readonly Dictionary<string, Scraper> r_Scrapers = new Dictionary<string, Scraper>(); // key = url, value = scraper
         private static bool v_StartedSceduleForScraper = false;
-        private readonly System.Text.StringBuilder m_menu = new System.Text.StringBuilder();
 
         public SystemManager()
         {
             m_schedueler = this.SchedulerConfig();
-            buildMainMenu();
-        }
-
-        private void buildMainMenu()
-        {
-            m_menu.Append("Quit");
-            m_menu.Append('\n');
-            m_menu.Append("Add Scraper");
-            m_menu.Append('\n');
-            m_menu.Append("Remove Scraper");
-            m_menu.Append('\n');
-            m_menu.Append("Print All Scrapers");
-            m_menu.Append('\n');
-            m_menu.Append("Print All Not Connected URL");
-            m_menu.Append('\n');
-            m_menu.Append("Start Daily Get All Football Match And Calculate Arbitrage");
         }
 
         public void OpenSystemManagerForArbitrageFounder()
         {
-            int userChoise;
+            string userChoise;
+            StringBuilder menu = buildMainMenuFromeMemu();
 
-            userChoise = UI.printMenuToUserToGetNextAction(m_menu);
+            userChoise = earaseSpaceInString(UI.printMenuToUserToGetNextAction(menu));
 
-            while (userChoise != (int)eMenu.Quit)
+            while (userChoise != eMenu.Quit.ToString())
             {
-                if (userChoise == (int)eMenu.AddScraperToDict) {
+                if (userChoise == eMenu.AddScraperToDict.ToString()) {
                     getScraperFromUserAndAdd();
                 }
-                else if (userChoise == (int)eMenu.RemoveScraperFromDict) {
+                else if (userChoise == eMenu.RemoveScraperFromDict.ToString()) {
                     getUrlToOfScraper();
                 }
-                else if (userChoise == (int)eMenu.PrintAllScrapers)
+                else if (userChoise == eMenu.PrintAllScrapers.ToString())
                 {
                     printAllScapers();
                 }
-                else if (userChoise == (int)eMenu.PrintAllNotConnectedUrl) {
+                else if (userChoise == eMenu.PrintAllNotConnectedUrl.ToString()) {
                     printNotConnectedScapers();
                 }
-                else if (userChoise == (int)eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage) {
+                else if (userChoise == eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString()) {
                     if (v_StartedSceduleForScraper == false) {
                         this.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
-                        m_menu.Remove(m_menu.Length - "Start Daily Get All Football Match And Calculate Arbitrage".Length - 3, "Start Daily Get All Football Match And Calculate Arbitrage".Length + 3);
+                        menu.Remove(menu.Length - eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString().Length - 3, eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString().Length + 3);
                     }
                     else {
                         UI.PrintInvalidInput();
@@ -81,7 +65,7 @@ namespace Arbitrage
                     UI.PrintInvalidInput();
                 }
 
-                userChoise = UI.printMenuToUserToGetNextAction(m_menu);
+                userChoise = UI.printMenuToUserToGetNextAction(menu);
             }
         }
 
@@ -220,10 +204,11 @@ namespace Arbitrage
         private void getUrlToOfScraper()
         {
             System.Text.StringBuilder menuOfUrlToRempove = new System.Text.StringBuilder();
-            buildMenuOfUrlToRemove(menuOfUrlToRempove);
-            int urlToRemove = UI.printMenuToUserToGetNextAction(menuOfUrlToRempove);
 
-            bool v_ScraperRemoved = this.RemoveScraperFromDict(this.r_Scrapers[]);
+            buildMenuOfUrlToRemove(menuOfUrlToRempove);
+
+            string urlToRemove = UI.printMenuToUserToGetNextAction(menuOfUrlToRempove);
+            bool v_ScraperRemoved = this.RemoveScraperFromDict(urlToRemove);
 
             if (v_ScraperRemoved == false)
             {
@@ -262,6 +247,57 @@ namespace Arbitrage
             }
 
             UI.PrintString(urlOfNotConnectedScrapers.ToString());
+        }
+
+        private StringBuilder buildMainMenuFromeMemu()
+        {
+            StringBuilder newMenu = new StringBuilder();
+
+            newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.Quit.ToString()));
+            newMenu.Append('\n');
+            newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.AddScraperToDict.ToString()));
+            newMenu.Append('\n');
+            newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.RemoveScraperFromDict.ToString()));
+            newMenu.Append('\n');
+            newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.PrintAllScrapers.ToString()));
+            newMenu.Append('\n');
+            newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.PrintAllNotConnectedUrl.ToString()));
+            newMenu.Append('\n');
+            newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString()));
+
+            return newMenu;
+        }
+
+        private static string seperateLineBySpaceBeforeCapitalLetter(string i_Line)
+        {
+            StringBuilder newSeperatedLine = new StringBuilder();
+
+            foreach (char c in i_Line)
+            {
+                if (c >= 'A' && c <= 'Z' && newSeperatedLine.Length != 0)
+                {
+                    newSeperatedLine.Append(' ');
+                }
+
+                newSeperatedLine.Append(c);
+            }
+
+            return newSeperatedLine.ToString();
+        }
+
+        private static string earaseSpaceInString(string i_Line)
+        {
+            StringBuilder newLineWithoutSpaces = new StringBuilder();
+
+            foreach (char c in i_Line)
+            {
+                if (c != ' ')
+                {
+                    newLineWithoutSpaces.Append(c);
+                }
+            }
+
+            return newLineWithoutSpaces.ToString();
         }
     }
 }

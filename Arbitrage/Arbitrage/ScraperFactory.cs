@@ -1,23 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text;
 
 namespace Arbitrage
 {
     public static class ScraperFactory
     {
-        private static readonly StringBuilder m_Menu = new StringBuilder();
-
         static ScraperFactory()
         {
             buildMenu();
         }
 
-        private static void buildMenu()
+        private static StringBuilder buildMenu()
         {
-            m_Menu.Append(eTypeOfScrapers.Winner.ToString());
+            StringBuilder newMenu = new StringBuilder();
+
+            newMenu.Append(eTypeOfScrapers.Winner.ToString());
+
+            return newMenu;
         }
 
         public enum eTypeOfScrapers
@@ -27,12 +25,13 @@ namespace Arbitrage
 
         public static Scraper MakeNewScpraper(string i_Url)
         {
+            StringBuilder menu = buildMenu();
             Scraper newScraper = null;
-            eTypeOfScrapers userChoice;
+            string userChoice;
 
-            userChoice = (eTypeOfScrapers)UI.printMenuToUserToGetNextAction(m_Menu);
+            userChoice = UI.printMenuToUserToGetNextAction(menu);
 
-            if(userChoice == eTypeOfScrapers.Winner)
+            if(userChoice == eTypeOfScrapers.Winner.ToString())
             {
                 newScraper = new ScraperWinner(i_Url);
             }

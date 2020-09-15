@@ -66,16 +66,21 @@ namespace Arbitrage
                     return (" ");
                 }
             }
-            catch (NullReferenceException e)
-            {
-                Console.WriteLine("an Error Ocuured When Trying To Connect to: " + m_StatsUrl + Environment.NewLine + e.Message);
-                return " ";
-            }
             catch(Exception e)
             {
-                Console.WriteLine("an Error Ocuured When Trying To Connect to: " + m_StatsUrl + Environment.NewLine + e.Message);
+                //Console.WriteLine("an Error Ocuured When Trying To Connect to: " + m_StatsUrl + Environment.NewLine + e.Message);
                 return " ";
             }
+        }
+
+        public override string ToString()
+        {
+            return WebsiteUrl;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.WebsiteUrl.GetHashCode();
         }
     }
 }

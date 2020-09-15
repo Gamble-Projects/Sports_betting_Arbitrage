@@ -18,13 +18,14 @@ namespace Arbitrage
             makeDictOfHebWord();
         }
 
-        public static int printMenuToUserToGetNextAction(StringBuilder i_Menu)
+        public static string printMenuToUserToGetNextAction(StringBuilder i_Menu)
         {
             int i = 0;
             string inputFromUser;
-            int actionUserChose = 0;
+            int numberTheUserChose;
             bool v_ValidInput = false;
-            Array arrOfMenu = i_Menu.ToString().Split('\n');
+            string[] arrOfMenu = i_Menu.ToString().Split('\n');
+            string theActionTheUserChose = null;
 
             while (v_ValidInput == false)
             {
@@ -36,9 +37,17 @@ namespace Arbitrage
 
                 inputFromUser = Console.ReadLine();
 
-                if (int.TryParse(inputFromUser, out actionUserChose) == true)
+                if (int.TryParse(inputFromUser, out numberTheUserChose))
                 {
-                    v_ValidInput = true;
+                    if (numberTheUserChose >= 0 && numberTheUserChose <= i)
+                    {
+                        theActionTheUserChose = arrOfMenu[numberTheUserChose];
+                        v_ValidInput = true;
+                    }
+                    else
+                    {
+                        Console.WriteLine("out of range try again");
+                    }
                 }
                 else
                 {
@@ -47,7 +56,7 @@ namespace Arbitrage
                 }
             }
 
-            return actionUserChose;
+            return theActionTheUserChose;
         }
 
         private static void makeDictOfHebWord()
