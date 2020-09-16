@@ -20,7 +20,6 @@ namespace Arbitrage
 
         public static string printMenuToUserToGetNextAction(StringBuilder i_Menu)
         {
-            int i = 0;
             string inputFromUser;
             int numberTheUserChose;
             bool v_ValidInput = false;
@@ -29,6 +28,8 @@ namespace Arbitrage
 
             while (v_ValidInput == false)
             {
+                int i = 0;
+
                 foreach (string action in arrOfMenu)
                 {
                     Console.WriteLine(string.Format(@"To {0} press {1}", action, i));
@@ -39,7 +40,7 @@ namespace Arbitrage
 
                 if (int.TryParse(inputFromUser, out numberTheUserChose))
                 {
-                    if (numberTheUserChose >= 0 && numberTheUserChose <= i)
+                    if (numberTheUserChose >= 0 && numberTheUserChose < i)
                     {
                         theActionTheUserChose = arrOfMenu[numberTheUserChose];
                         v_ValidInput = true;
@@ -52,7 +53,6 @@ namespace Arbitrage
                 else
                 {
                     Console.WriteLine("invalid Input");
-                    Console.Clear();
                 }
             }
 
@@ -111,14 +111,23 @@ namespace Arbitrage
             return userInput;
         }
 
-        public static Scraper CreateNewScraperWithUser()
+        public static Scraper CreateNewScraperWithUser(Dictionary<string, Scraper> i_ExistedScrapers)
         {
             string urlOfScraper = UI.GetInputFromUser("Please Enter The URL of The New Scraper: ");
-            Scraper newScraper = ScraperFactory.MakeNewScpraper(urlOfScraper);
+            Scraper newScraper = null;
 
-            if(newScraper == null)
+            if (i_ExistedScrapers.ContainsKey(urlOfScraper) == false)
             {
-                Console.WriteLine("The scraper you want to add wasn't been added");
+                newScraper = ScraperFactory.MakeNewScpraper(urlOfScraper);
+
+                if (newScraper == null)
+                {
+                    Console.WriteLine("The scraper you want to add wasn't been added");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Scraper Already Exist");
             }
 
             return newScraper;

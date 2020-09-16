@@ -39,33 +39,52 @@ namespace Arbitrage
 
             while (userChoise != eMenu.Quit.ToString())
             {
-                if (userChoise == eMenu.AddScraperToDict.ToString()) {
+                if (userChoise == eMenu.AddScraperToDict.ToString())
+                {
                     getScraperFromUserAndAdd();
                 }
-                else if (userChoise == eMenu.RemoveScraperFromDict.ToString()) {
-                    getUrlToOfScraper();
+                else if (userChoise == eMenu.RemoveScraperFromDict.ToString())
+                {
+                    getUrlToOfScraperToRemove();
                 }
                 else if (userChoise == eMenu.PrintAllScrapers.ToString())
                 {
                     printAllScapers();
                 }
-                else if (userChoise == eMenu.PrintAllNotConnectedUrl.ToString()) {
+                else if (userChoise == eMenu.PrintAllNotConnectedUrl.ToString())
+                {
                     printNotConnectedScapers();
                 }
-                else if (userChoise == eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString()) {
-                    if (v_StartedSceduleForScraper == false) {
+                else if (userChoise == eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString())
+                {
+
+                    if (v_StartedSceduleForScraper == false)
+                    {
                         this.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage();
-                        menu.Remove(menu.Length - eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString().Length - 3, eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString().Length + 3);
+                        menu.Remove(menu.Length - 1 - seperateLineBySpaceBeforeCapitalLetter(eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString()).Length
+                            , seperateLineBySpaceBeforeCapitalLetter(eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString()).Length + 1);
                     }
-                    else {
+                    else
+                    {
                         UI.PrintInvalidInput();
                     }
                 }
-                else{
+                else
+                {
                     UI.PrintInvalidInput();
                 }
 
-                userChoise = UI.printMenuToUserToGetNextAction(menu);
+                userChoise = earaseSpaceInString(UI.printMenuToUserToGetNextAction(menu));
+            }
+        }
+
+        private void getScraperFromUserAndAdd()
+        {
+            Scraper userScraper = UI.CreateNewScraperWithUser(r_Scrapers);
+
+            if (userScraper != null)
+            {
+                this.AddScraperToDict(userScraper);
             }
         }
 
@@ -73,13 +92,27 @@ namespace Arbitrage
         {
             bool v_ScraperAdded = false;
 
-            // get connection
-            //i_NewScraper.LoadUrl();
             //add event
             i_NewScraper.AddActionDelegate(this.OnFailConnection);
             // add to dict
             r_Scrapers.Add(i_NewScraper.WebsiteUrl, i_NewScraper);
+
             return v_ScraperAdded;
+        }
+
+        private void getUrlToOfScraperToRemove()
+        {
+            System.Text.StringBuilder menuOfUrlToRempove = new System.Text.StringBuilder();
+
+            buildMenuOfUrlToRemove(menuOfUrlToRempove);
+
+            string urlToRemove = UI.printMenuToUserToGetNextAction(menuOfUrlToRempove);
+            bool v_ScraperRemoved = this.RemoveScraperFromDict(urlToRemove);
+
+            if (v_ScraperRemoved == false)
+            {
+                UI.PrintInvalidInput();
+            }
         }
 
         private bool RemoveScraperFromDict(string i_Url)
@@ -100,45 +133,39 @@ namespace Arbitrage
             // remove from dictionary
             return v_ScraperBeenRemoved;
         }
-        /*
-        // Do This Daily Basis ????
-        public void DailyGetAllFootballMatchFromScrapersAndCalculateArbitrage()
+
+        private void buildMenuOfUrlToRemove(StringBuilder menuOfUrlToRempove)
         {
-            List<FootballMatch> footballMatchesToBetOn = new List<FootballMatch>();
-            Console.WriteLine("at list matches");
-            foreach (Scraper scraper in r_Scrapers.Values)
+            foreach (string url in this.r_Scrapers.Keys)
             {
-                try
-                {
-                    scraper.LoadUrl();
-                    List<FootballMatch> FootballMatchesFromScraper = scraper.MakeListOfDailyMatchesPlaying();
-
-                    foreach (FootballMatch match in FootballMatchesFromScraper)
-                    {
-                        FootballMatch tempMatch = match;
-
-                        if (Arbitrager.isArbitrage(ref tempMatch) == true)
-                        {
-                            Arbitrager.GamblingRatio(ref tempMatch);
-                            tempMatch.MatchStats = scraper.StatsCollector(tempMatch.StatsUrl);
-                            footballMatchesToBetOn.Add(tempMatch);
-                        }
-                    }
-
-                    foreach (FootballMatch match in footballMatchesToBetOn)
-                    {
-                        Console.WriteLine(match.FirstTeam + " " + match.FirstTeamGamble + " " + match.SecondTeam + " " + match.SecondTeamGamble);
-                        Console.WriteLine(match.MatchStats);
-                    }
-                    // bet/send message/dont know on arbitrage game (footballMatchesToBetOn)
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
+                menuOfUrlToRempove.Append(url);
             }
         }
-        */
+
+        private void printAllScapers()
+        {
+            System.Text.StringBuilder urlOfScrapers = new System.Text.StringBuilder();
+
+            foreach (string url in r_Scrapers.Keys)
+            {
+                urlOfScrapers.AppendLine(url);
+            }
+
+            UI.PrintString(urlOfScrapers.ToString());
+        }
+
+        private void printNotConnectedScapers()
+        {
+            System.Text.StringBuilder urlOfNotConnectedScrapers = new System.Text.StringBuilder();
+
+            foreach (string url in this.m_NotConnectedUrl)
+            {
+                urlOfNotConnectedScrapers.AppendLine(url);
+            }
+
+            UI.PrintString(urlOfNotConnectedScrapers.ToString());
+        }
+
         // in video youtube return Task<IActionResult> (https://www.youtube.com/watch?v=4HPY3Mk5TsA&list=PLSi1BNmQ61ZohCcl43UdAksg7X3_TSmly&index=9)
         private async void StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage() {
             v_StartedSceduleForScraper = true;
@@ -152,7 +179,7 @@ namespace Arbitrage
             ITrigger trigger = TriggerBuilder.Create()
                 .WithIdentity("Arbitrager", "DailyBasis")
                 .StartNow()
-                .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(00, 21)).EndingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 59)).WithIntervalInMinutes(1))
+                .WithDailyTimeIntervalSchedule(x => x.StartingDailyAt(TimeOfDay.HourAndMinuteOfDay(00, 20)).EndingDailyAt(TimeOfDay.HourAndMinuteOfDay(23, 59)).WithIntervalInMinutes(1))
                 .Build();
 
             await m_schedueler.ScheduleJob(jobDetail, trigger);
@@ -191,78 +218,20 @@ namespace Arbitrage
             this.RemoveScraperFromDict(i_Url);
         }
 
-        private void getScraperFromUserAndAdd()
-        {
-            Scraper userScraper = UI.CreateNewScraperWithUser();
-
-            if (userScraper != null)
-            {
-                this.AddScraperToDict(userScraper);
-            }
-        }
-
-        private void getUrlToOfScraper()
-        {
-            System.Text.StringBuilder menuOfUrlToRempove = new System.Text.StringBuilder();
-
-            buildMenuOfUrlToRemove(menuOfUrlToRempove);
-
-            string urlToRemove = UI.printMenuToUserToGetNextAction(menuOfUrlToRempove);
-            bool v_ScraperRemoved = this.RemoveScraperFromDict(urlToRemove);
-
-            if (v_ScraperRemoved == false)
-            {
-                UI.PrintInvalidInput();
-            }
-        }
-
-        private void buildMenuOfUrlToRemove(StringBuilder menuOfUrlToRempove)
-        {
-            foreach(string url in this.r_Scrapers.Keys)
-            {
-                menuOfUrlToRempove.Append("Remove" + url);
-                menuOfUrlToRempove.Append('\n');
-            }
-        }
-
-        private void printAllScapers()
-        {
-            System.Text.StringBuilder urlOfScrapers = new System.Text.StringBuilder();
-
-            foreach(string url in r_Scrapers.Keys)
-            {
-                urlOfScrapers.AppendLine(url);
-            }
-
-            UI.PrintString(urlOfScrapers.ToString());
-        }
-
-        private void printNotConnectedScapers()
-        {
-            System.Text.StringBuilder urlOfNotConnectedScrapers = new System.Text.StringBuilder();
-
-            foreach (string url in this.m_NotConnectedUrl)
-            {
-                urlOfNotConnectedScrapers.AppendLine(url);
-            }
-
-            UI.PrintString(urlOfNotConnectedScrapers.ToString());
-        }
-
         private StringBuilder buildMainMenuFromeMemu()
         {
             StringBuilder newMenu = new StringBuilder();
 
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.Quit.ToString()));
-            newMenu.Append('\n');
+            newMenu.Append(Environment.NewLine);
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.AddScraperToDict.ToString()));
-            newMenu.Append('\n');
+            newMenu.Append(Environment.NewLine);
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.RemoveScraperFromDict.ToString()));
-            newMenu.Append('\n');
+            newMenu.Append(Environment.NewLine);
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.PrintAllScrapers.ToString()));
-            newMenu.Append('\n');
+            newMenu.Append(Environment.NewLine);
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.PrintAllNotConnectedUrl.ToString()));
-            newMenu.Append('\n');
+            newMenu.Append(Environment.NewLine);
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString()));
 
             return newMenu;

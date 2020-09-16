@@ -44,7 +44,7 @@ namespace Arbitrage
 
                     foreach (FootballMatch match in footballMatchesToBetOn)
                     {
-                        Console.WriteLine(match.FirstTeam + " " + match.FirstTeamGamble + " " + match.SecondTeam + " " + match.SecondTeamGamble);
+                        Console.WriteLine(" מהכסף שלך"+ match.FirstTeamGamble + " " + match.FirstTeam +" מהכסף שלך, ועל הקבוצה "+ match.SecondTeamGamble + " " + match.SecondTeam + "תהמר על הקבוצה ");
                         Console.WriteLine(match.MatchStats);
                     }
                     // bet/send message/dont know on arbitrage game (footballMatchesToBetOn)

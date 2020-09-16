@@ -59,11 +59,11 @@ namespace Arbitrage
 
                 if (nodesTeamNames1[2].InnerText != "0")
                 {
-                    return UI.ArrangeHebStringToBeHebUICustomize(" נגמרו בתיקו. ") + nodesTeamNames2[0].InnerText[0] + UI.ArrangeHebStringToBeHebUICustomize(" משחקים, מתוכם ") + nodesTeamNames1[2].InnerText + UI.ArrangeHebStringToBeHebUICustomize(" הקבוצות שיחקו");
+                    return UI.ArrangeHebStringToBeHebUICustomize(" נגמרו בתיקו.") + nodesTeamNames2[0].InnerText[0] + UI.ArrangeHebStringToBeHebUICustomize(" משחקים, מתוכם ") + nodesTeamNames1[2].InnerText + UI.ArrangeHebStringToBeHebUICustomize(" הקבוצות שיחקו ") + Environment.NewLine;
                 }
                 else
                 {
-                    return (" ");
+                    return " ";
                 }
             }
             catch(Exception e)
