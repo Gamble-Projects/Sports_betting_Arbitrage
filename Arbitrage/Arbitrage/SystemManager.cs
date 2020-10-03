@@ -223,15 +223,15 @@ namespace Arbitrage
             StringBuilder newMenu = new StringBuilder();
 
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.Quit.ToString()));
-            newMenu.Append(Environment.NewLine);
+            newMenu.Append('\n');
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.AddScraperToDict.ToString()));
-            newMenu.Append(Environment.NewLine);
+            newMenu.Append('\n');
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.RemoveScraperFromDict.ToString()));
-            newMenu.Append(Environment.NewLine);
+            newMenu.Append('\n');
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.PrintAllScrapers.ToString()));
-            newMenu.Append(Environment.NewLine);
+            newMenu.Append('\n');
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.PrintAllNotConnectedUrl.ToString()));
-            newMenu.Append(Environment.NewLine);
+            newMenu.Append('\n');
             newMenu.Append(seperateLineBySpaceBeforeCapitalLetter(eMenu.StartJobExecutionOnDailyGetAllFootballMatchFromScrapersAndCalculateArbitrage.ToString()));
 
             return newMenu;

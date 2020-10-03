@@ -61,7 +61,7 @@ namespace Arbitrage
 
         private static void makeDictOfHebWord()
         {
-            string hebChar = " .ףץםןאבגדהוזחטיכלמנסעפצקרשת";
+            string hebChar = " .ףץםןאבגךדהוזחטיכלמנסעפצקרשת";
 
             foreach (char c in hebChar)
             {
